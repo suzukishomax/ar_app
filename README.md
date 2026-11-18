@@ -14,6 +14,7 @@ src/app.js              ★ 体験の中身（ブランチごとにここを書�
 src/core/ar.js          8th Wall の起動（カメラ・SLAM・three.js）※基本触らない
 src/core/text-label.js  文字 → 3D の板（Canvas 描画なので日本語・絵文字 OK）
 src/core/placement.js   タップ位置 → 空間座標（hitTest → 地面 → 前方 1m）
+src/core/image-targets.js マーカーの読み込み・姿勢の反映
 src/core/three-global.js  window.THREE の公開
 scripts/copy-8thwall.js xrextras / landing-page を public/external にコピー
 .github/workflows/deploy.yml  push したブランチを GitHub Pages に自動公開
@@ -57,6 +58,16 @@ git switch -c game/xxxx     # 派生ブランチを作る
 # src/app.js を書き換える
 git push -u origin game/xxxx  # → .../game-xxxx/ に公開
 ```
+
+## マーカー（イメージターゲット）— `marker/image-target` ブランチ
+
+印刷したマーカーを映すと、その上に文字を表示する（共有メモのステップ1）。
+
+- 印刷用ページ: `<公開URL>/print-marker.html`（A4・倍率100%で印刷 → 120×160mm）
+- マーカー追加: `npm run marker -- desk-b "DESK B"` → `markers/` に画像、`public/image-targets/` に認識データ
+  （8th Wall 公式の `@8thwall/image-target-cli` を使用）。`src/app.js` の `MARKERS` に追記する
+- 子要素の座標系: マーカー中心が原点・マーカー面が XY 平面・+Z が手前。縦長マーカーは高さ 1 / 幅 0.75
+- 見失っても表示は消さず、SLAM で同じ位置に残るかを確認できる（画面下に状態と距離を表示）
 
 ## 今後：複数人で空間メモを共有するには
 
