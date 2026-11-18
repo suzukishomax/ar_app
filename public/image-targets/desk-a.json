@@ -1,0 +1,23 @@
+{
+  "imagePath": "image-targets/desk-a_luminance.png",
+  "metadata": null,
+  "name": "desk-a",
+  "type": "PLANAR",
+  "properties": {
+    "left": 0,
+    "top": 0,
+    "width": 1200,
+    "height": 1600,
+    "isRotated": false,
+    "originalWidth": 1200,
+    "originalHeight": 1600
+  },
+  "resources": {
+    "originalImage": "desk-a_original.png",
+    "croppedImage": "desk-a_cropped.png",
+    "thumbnailImage": "desk-a_thumbnail.png",
+    "luminanceImage": "desk-a_luminance.png"
+  },
+  "created": 1794970481243,
+  "updated": 1794970481243
+}

@@ -9,7 +9,8 @@
     "dev": "vite --host",
     "build": "node scripts/copy-8thwall.js && vite build",
     "preview": "vite preview --host",
-    "qr": "node scripts/qr.js"
+    "qr": "node scripts/qr.js",
+    "marker": "node scripts/make-marker.js"
   },
   "dependencies": {
     "@8thwall/landing-page": "1.0.0",
@@ -17,6 +18,7 @@
     "three": "0.170.0"
   },
   "devDependencies": {
+    "@8thwall/image-target-cli": "^1.0.0",
     "@vitejs/plugin-basic-ssl": "1.2.0",
     "qrcode": "1.5.4",
     "vite": "5.4.21"

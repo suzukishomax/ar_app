@@ -4,11 +4,14 @@
 //   1. XRExtras / XR8 のロードを待つ
 //   2. カメラ・SLAM・three.js のパイプラインを組み立てて起動
 //   3. three.js のシーン準備ができたら createApp(ctx) を呼ぶ
-// createApp は {update?(dt)} を返せば毎フレーム呼ばれる。
+// createApp は {update?(dt), onEvent?(name, detail)} を返す。
+//   update   : 毎フレーム呼ばれる
+//   onEvent  : events に指定した 8th Wall のイベント（例 'reality.imagefound'）で呼ばれる
+// beforeRun : カメラ起動前に一度だけ呼ばれる async 関数（XR8 の設定などに使う）
 
 const CAMERA_HEIGHT = 1.5 // 初期カメラの高さ。地面 y=0 からの距離がワールドの縮尺（≒メートル）になる
 
-export function startAR({canvas, createApp}) {
+export function startAR({canvas, createApp, beforeRun, events = []}) {
   let app = null
   let last = performance.now()
 
@@ -37,10 +40,15 @@ export function startAR({canvas, createApp}) {
       last = now
       app?.update?.(dt)
     },
+    listeners: events.map((event) => ({
+      event,
+      process: ({detail}) => app?.onEvent?.(event, detail),
+    })),
   }
 
-  const onxrloaded = () => {
+  const onxrloaded = async () => {
     XR8.XrController.configure({disableWorldTracking: false})
+    await beforeRun?.()
     XR8.addCameraPipelineModules([
       XR8.GlTextureRenderer.pipelineModule(), // カメラ映像の描画
       XR8.Threejs.pipelineModule(), // three.js のシーン/カメラ/レンダラー
