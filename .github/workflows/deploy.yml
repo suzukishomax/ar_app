@@ -1,0 +1,69 @@
+# push されたブランチを GitHub Pages の /<repo>/<branch>/ に公開する。
+# 例: main -> https://<user>.github.io/<repo>/main/
+#     feature/memo -> https://<user>.github.io/<repo>/feature-memo/
+# 公開URLとQRコードは Actions の実行結果ページ（Summary）に表示される。
+name: Deploy branch preview
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref_name != 'gh-pages'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Compute paths
+        id: vars
+        run: |
+          SLUG=$(echo "${GITHUB_REF_NAME}" | sed 's#[^A-Za-z0-9._-]#-#g')
+          REPO="${GITHUB_REPOSITORY#*/}"
+          OWNER="${GITHUB_REPOSITORY_OWNER,,}"
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          echo "base=/$REPO/$SLUG/" >> "$GITHUB_OUTPUT"
+          echo "url=https://$OWNER.github.io/$REPO/$SLUG/" >> "$GITHUB_OUTPUT"
+
+      - run: npm ci
+
+      - run: npm run build
+        env:
+          BASE_PATH: ${{ steps.vars.outputs.base }}
+
+      - name: Deploy to gh-pages/${{ steps.vars.outputs.slug }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          destination_dir: ${{ steps.vars.outputs.slug }}
+          keep_files: true
+
+      - name: Show URL and QR code
+        env:
+          URL: ${{ steps.vars.outputs.url }}
+        run: |
+          {
+            echo "## 📱 スマホで読み込んでテスト"
+            echo ""
+            echo "**URL:** $URL"
+            echo ""
+            echo '```'
+            node -e "require('qrcode').toString(process.env.URL,{type:'utf8'}).then(s=>process.stdout.write(s))"
+            echo '```'
+            echo ""
+            echo "_反映まで1〜2分かかることがあります。PCでURLを開くと、ページ上にもQRコードが表示されます。_"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "Deployed: $URL"

@@ -1,0 +1,24 @@
+{
+  "name": "ar-app-base",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "8th Wall + three.js で空間に文字を置く Web AR の基盤",
+  "scripts": {
+    "postinstall": "node scripts/copy-8thwall.js",
+    "dev": "vite --host",
+    "build": "node scripts/copy-8thwall.js && vite build",
+    "preview": "vite preview --host",
+    "qr": "node scripts/qr.js"
+  },
+  "dependencies": {
+    "@8thwall/landing-page": "1.0.0",
+    "@8thwall/xrextras": "1.0.0",
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-basic-ssl": "1.2.0",
+    "qrcode": "1.5.4",
+    "vite": "5.4.21"
+  }
+}
